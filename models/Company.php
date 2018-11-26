@@ -53,7 +53,8 @@ class Company extends BaseModel
         return [
             'id' => 'ID',
             'name' => 'Name',
-            'category_id' => 'Category',
+            'category_id' => 'Category ID',
+            'categoryName' => 'Category',
             'website' => 'Website',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',

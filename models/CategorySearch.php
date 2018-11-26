@@ -10,6 +10,13 @@ use yii\data\ActiveDataProvider;
  */
 class CategorySearch extends Category
 {
+    use DateFormatter;
+
+    public $createdFrom;
+    public $createdTo;
+    public $updatedFrom;
+    public $updatedTo;
+
     /**
      * {@inheritdoc}
      */
@@ -17,7 +24,7 @@ class CategorySearch extends Category
     {
         return [
             [['id'], 'integer'],
-            [['name'], 'safe'],
+            [['name', 'createdFrom', 'createdTo', 'updatedFrom', 'updatedTo',], 'safe'],
         ];
     }
 
@@ -60,6 +67,14 @@ class CategorySearch extends Category
             'id' => $this->id,
         ]);
 
+        $query->andFilterWhere(['between', 'created_at',
+            $this->convertStrDateToFormat($this->createdFrom, 'd.m.Y','Y-m-d'),
+            $this->convertStrDateToFormat($this->createdTo, 'd.m.Y','Y-m-d')
+        ]);
+        $query->andFilterWhere(['between', 'updated_at',
+            $this->convertStrDateToFormat($this->updatedFrom, 'd.m.Y','Y-m-d'),
+            $this->convertStrDateToFormat($this->updatedTo, 'd.m.Y','Y-m-d')
+        ]);
         $query->andFilterWhere(['like', 'name', $this->name]);
 
         return $dataProvider;

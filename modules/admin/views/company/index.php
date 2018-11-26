@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 use app\models\Company;
+use \kartik\date\DatePicker;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\CompanySearch */
@@ -30,7 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'name',
             [
-                'attribute' => 'category_id',
+                'attribute' => 'categoryName',
                 'label' => 'Category',
                 'value' => function (Company $model) {
                     return Yii::$app->view->render('_categoryName', [
@@ -46,8 +47,38 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'format' => 'html'
             ],
-            'created_at',
-            'updated_at',
+            [
+                'attribute' => 'created_at',
+                'filter' => DatePicker::widget([
+                    'model'=> $searchModel,
+                    'attribute'=>'createdFrom',
+                    'attribute2' => 'createdTo',
+                    'type' => DatePicker::TYPE_RANGE,
+                    'pluginOptions' => [
+                        'autoclose'=> true,
+                        'format' => 'dd.mm.yyyy',
+                    ],
+                    'size' => 'sm',
+                ]),
+                'options' => ['width' => '215px'],
+                'format' => ['date', 'php:d.m.Y H:i:s'],
+            ],
+            [
+                'attribute' => 'updated_at',
+                'filter' => DatePicker::widget([
+                    'model'=> $searchModel,
+                    'attribute'=>'updatedFrom',
+                    'attribute2' => 'updatedTo',
+                    'type' => DatePicker::TYPE_RANGE,
+                    'pluginOptions' => [
+                        'autoclose'=> true,
+                        'format' => 'dd.mm.yyyy',
+                    ],
+                    'size' => 'sm',
+                ]),
+                'options' => ['width' => '215px'],
+                'format' => ['date', 'php:d.m.Y H:i:s'],
+            ],
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

@@ -10,6 +10,14 @@ use yii\data\ActiveDataProvider;
  */
 class CompanySearch extends Company
 {
+    use DateFormatter;
+
+    public $categoryName;
+    public $createdFrom;
+    public $createdTo;
+    public $updatedFrom;
+    public $updatedTo;
+
     /**
      * {@inheritdoc}
      */
@@ -17,7 +25,7 @@ class CompanySearch extends Company
     {
         return [
             [['id', 'category_id'], 'integer'],
-            [['name', 'website'], 'safe'],
+            [['name', 'website', 'categoryName', 'createdFrom', 'createdTo', 'updatedFrom', 'updatedTo',], 'safe'],
         ];
     }
 
@@ -45,6 +53,18 @@ class CompanySearch extends Company
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => [
+                'attributes' => [
+                    'name',
+                    'categoryName' => [
+                        'asc' => ['category.name' => SORT_ASC],
+                        'desc' => ['category.name' => SORT_DESC],
+                    ],
+                    'website',
+                    'created_at',
+                    'updated_at',
+                ],
+            ],
         ]);
 
         $this->load($params);
@@ -52,8 +72,11 @@ class CompanySearch extends Company
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
+            $query->joinWith('category');
             return $dataProvider;
         }
+
+        $query->joinWith('category');
 
         // grid filtering conditions
         $query->andFilterWhere([
@@ -61,8 +84,18 @@ class CompanySearch extends Company
             'category_id' => $this->category_id,
         ]);
 
+        $query->andFilterWhere(['between', 'company.created_at',
+            $this->convertStrDateToFormat($this->createdFrom, 'd.m.Y','Y-m-d'),
+            $this->convertStrDateToFormat($this->createdTo, 'd.m.Y','Y-m-d')
+        ]);
+        $query->andFilterWhere(['between', 'company.updated_at',
+            $this->convertStrDateToFormat($this->updatedFrom, 'd.m.Y','Y-m-d'),
+            $this->convertStrDateToFormat($this->updatedTo, 'd.m.Y','Y-m-d')
+        ]);
+
         $query->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'website', $this->website]);
+            ->andFilterWhere(['like', 'website', $this->website])
+            ->andFilterWhere(['like', 'category.name', $this->categoryName]);
 
         return $dataProvider;
     }
